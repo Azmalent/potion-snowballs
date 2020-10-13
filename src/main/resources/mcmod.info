@@ -1,0 +1,12 @@
+[
+{
+  "modid": "${modid}",
+  "name": "Potion Snowballs",
+  "description": "Adds potion-infused snowballs.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["azmalent"]
+}
+]
