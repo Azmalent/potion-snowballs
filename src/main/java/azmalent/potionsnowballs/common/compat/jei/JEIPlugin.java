@@ -1,5 +1,6 @@
 package azmalent.potionsnowballs.common.compat.jei;
 
+import azmalent.potionsnowballs.ModConfig;
 import azmalent.potionsnowballs.PotionSnowballs;
 import knightminer.inspirations.plugins.jei.cauldron.CauldronRecipeCategory;
 import knightminer.inspirations.plugins.jei.cauldron.ICauldronRecipeWrapper;
@@ -13,6 +14,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionType;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.Mod;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -38,19 +40,33 @@ public class JEIPlugin implements IModPlugin {
         List<TippedSnowballRecipeWrapper> recipes = new ArrayList();
         for (ResourceLocation potionTypeResourceLocation : PotionType.REGISTRY.getKeys()) {
             PotionType potionType = PotionType.REGISTRY.getObject(potionTypeResourceLocation);
-            TippedSnowballRecipeWrapper recipe = new TippedSnowballRecipeWrapper(potionType);
-            recipes.add(recipe);
+            if (ModConfig.normalPotionOutput > 0) {
+                TippedSnowballRecipeWrapper recipe = new TippedSnowballRecipeWrapper(potionType, Items.POTIONITEM, ModConfig.normalPotionOutput);
+                recipes.add(recipe);
+            }
+            if (ModConfig.splashPotionOutput > 0) {
+                TippedSnowballRecipeWrapper recipe = new TippedSnowballRecipeWrapper(potionType, Items.SPLASH_POTION, ModConfig.splashPotionOutput);
+                recipes.add(recipe);
+            }
+            if (ModConfig.lingeringPotionOutput > 0) {
+                TippedSnowballRecipeWrapper recipe = new TippedSnowballRecipeWrapper(potionType, Items.LINGERING_POTION, ModConfig.lingeringPotionOutput);
+                recipes.add(recipe);
+            }
         }
 
         return recipes;
     }
 
     private List<ICauldronRecipeWrapper> getCauldronRecipes() {
+        int amount = ModConfig.cauldronOutput * 8;
+
         List<ICauldronRecipeWrapper> recipes = new ArrayList();
-        recipes.add(new PotionWrapper.Fill(
-                new ItemStack(PotionSnowballs.TIPPED_SNOWBALL, 8),
-                new ItemStack(Items.SNOWBALL, 8))
-        );
+        if (amount > 0) {
+            recipes.add(new PotionWrapper.Fill(
+                new ItemStack(PotionSnowballs.TIPPED_SNOWBALL, amount),
+                new ItemStack(Items.SNOWBALL, amount))
+            );
+        }
 
         return recipes;
     }

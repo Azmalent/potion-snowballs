@@ -12,6 +12,7 @@ import net.minecraft.item.ItemSnowball;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionType;
 import net.minecraft.potion.PotionUtils;
+import net.minecraft.stats.StatList;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
@@ -30,7 +31,9 @@ public class ItemTippedSnowball extends ItemSnowball
     public static final String REGISTRY_NAME = PotionSnowballs.MODID + ":" + NAME;
 
     public ItemTippedSnowball() {
-        setRegistryName(REGISTRY_NAME);
+        setRegistryName(NAME);
+        setTranslationKey(NAME);
+        setCreativeTab(CreativeTabs.MISC);
     }
 
     @SideOnly(Side.CLIENT)
@@ -38,7 +41,8 @@ public class ItemTippedSnowball extends ItemSnowball
         return PotionUtils.addPotionToItemStack(super.getDefaultInstance(), PotionTypes.POISON);
     }
 
-    @Override public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
         ItemStack stack = playerIn.getHeldItem(handIn);
 
         if (!playerIn.capabilities.isCreativeMode) {
@@ -53,8 +57,7 @@ public class ItemTippedSnowball extends ItemSnowball
             worldIn.spawnEntity(snowball);
         }
 
-        //TODO?
-        //playerIn.addStat(StatList.getObjectUseStats(this));
+        playerIn.addStat(StatList.getObjectUseStats(this));
         return new ActionResult(EnumActionResult.SUCCESS, stack);
     }
 

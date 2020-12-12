@@ -1,7 +1,10 @@
 package azmalent.potionsnowballs.common.entity;
 
+import azmalent.potionsnowballs.PotionSnowballs;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.monster.EntityBlaze;
 import net.minecraft.entity.projectile.EntitySnowball;
+import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
@@ -10,6 +13,7 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.potion.PotionType;
 import net.minecraft.potion.PotionUtils;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
@@ -18,7 +22,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.List;
 
-public final class EntityTippedSnowball extends EntitySnowball
+public final class EntityTippedSnowball extends EntityThrowable
 {
     private static final DataParameter<ItemStack> SNOWBALL = EntityDataManager.createKey(EntityTippedSnowball.class, DataSerializers.ITEM_STACK);
     private static final DataParameter<Integer> COLOR = EntityDataManager.createKey(EntityTippedSnowball.class, DataSerializers.VARINT);
@@ -101,42 +105,50 @@ public final class EntityTippedSnowball extends EntitySnowball
         }
     }
 
+    @Override
     protected void onImpact(RayTraceResult result) {
-        if (result.entityHit != null && result.entityHit instanceof EntityLivingBase) {
-            EntityLivingBase living = (EntityLivingBase) result.entityHit;
+        if (world.isRemote) return;
 
-            ItemStack snowball = dataManager.get(SNOWBALL);
+        if (result.entityHit != null) {
+            if (result.entityHit instanceof EntityLivingBase) {
+                EntityLivingBase living = (EntityLivingBase) result.entityHit;
+                ItemStack snowball = dataManager.get(SNOWBALL);
 
-            PotionType potion = PotionUtils.getPotionFromItem(snowball);
-            if (potion != null) {
-                for (PotionEffect effect : potion.getEffects()) {
-                    living.addPotionEffect(
-                            new PotionEffect(effect.getPotion(),
-                                    Math.max(effect.getDuration() / 8, 1),
-                                    effect.getAmplifier(),
-                                    effect.getIsAmbient(),
-                                    effect.doesShowParticles()
-                            )
-                    );
+                PotionType potion = PotionUtils.getPotionFromItem(snowball);
+                if (potion != null) {
+                    for (PotionEffect effect : potion.getEffects()) {
+                        living.addPotionEffect(
+                                new PotionEffect(effect.getPotion(),
+                                        Math.max(effect.getDuration() / 8, 1),
+                                        effect.getAmplifier(),
+                                        effect.getIsAmbient(),
+                                        effect.doesShowParticles()
+                                )
+                        );
+                    }
+                }
+
+                for (PotionEffect effect : PotionUtils.getFullEffectsFromItem(snowball)) {
+                    living.addPotionEffect(effect);
                 }
             }
 
-            for (PotionEffect effect : PotionUtils.getFullEffectsFromItem(snowball)) {
-                living.addPotionEffect(effect);
-            }
+            float damage = result.entityHit instanceof EntityBlaze ? 3 : 0;
+            result.entityHit.attackEntityFrom(DamageSource.causeThrownDamage(this, this.getThrower()), damage);
         }
 
-        super.onImpact(result);
+        this.world.setEntityState(this, (byte)3);
+        this.setDead();
     }
 
     @SideOnly(Side.CLIENT)
     public void handleStatusUpdate(byte id) {
         if (id == 0) {
-            spawnPotionParticles(4);
+            spawnPotionParticles(world.rand.nextInt(4));
         }
-
-        //TODO: custom colored particles?
-        //super.handleStatusUpdate(id);
+        else if (id == 3) {
+            spawnPotionParticles(8);
+        }
     }
 
     public ItemStack getStackToRender() {

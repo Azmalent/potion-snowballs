@@ -1,9 +1,11 @@
 package azmalent.potionsnowballs.common.recipes;
 
 import azmalent.potionsnowballs.PotionSnowballs;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
@@ -13,30 +15,35 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 
 public class TippedSnowballRecipe extends IForgeRegistryEntry.Impl<IRecipe> implements IRecipe
 {
-    private ItemStack dummyResult;
+    private Item potionItem;
+    private int outputFactor;
 
-    public TippedSnowballRecipe() {
-        setRegistryName(PotionSnowballs.MODID, "tipped_snowballs");
-        dummyResult = new ItemStack(PotionSnowballs.TIPPED_SNOWBALL, 8);
+    public TippedSnowballRecipe(String id, Item potionItem, int outputFactor) {
+        setRegistryName(PotionSnowballs.MODID, id);
+        this.potionItem = potionItem;
+        this.outputFactor = outputFactor;
     }
 
     @Override
     public boolean matches(InventoryCrafting inv, World worldIn) {
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 3; col++) {
-                ItemStack stack = inv.getStackInRowAndColumn(row, col);
-                Item item = stack.getItem();
+        boolean requireBlocks = outputFactor > 1;
 
-                if (row == 1 && col == 1) {
-                    boolean isLingeringPotion = item == Items.LINGERING_POTION
-                            && stack.hasTagCompound()
-                            && stack.getTagCompound().hasKey("Potion");
-                    if (!isLingeringPotion) return false;
-                }
-                else {
-                    if (item != Items.SNOWBALL) return false;
-                }
+        for (int i = 0; i < inv.getSizeInventory(); i++) {
+            ItemStack stack = inv.getStackInSlot(i);
+
+            if (i == 4) {
+                boolean isPotion = stack.getItem() == potionItem
+                        && stack.hasTagCompound()
+                        && stack.getTagCompound().hasKey("Potion");
+                if (!isPotion) return false;
             }
+            else if (requireBlocks) {
+                if (i % 2 == 1) {
+                    if (stack.getItem() != ItemBlock.getItemFromBlock(Blocks.SNOW)) return false;
+                }
+                else if (!stack.isEmpty()) return false;
+            }
+            else if (stack.getItem() != Items.SNOWBALL) return false;
         }
 
         return true;
@@ -44,11 +51,12 @@ public class TippedSnowballRecipe extends IForgeRegistryEntry.Impl<IRecipe> impl
 
     @Override
     public ItemStack getCraftingResult(InventoryCrafting inv) {
-        ItemStack result = new ItemStack(PotionSnowballs.TIPPED_SNOWBALL, 8);
+        ItemStack result = new ItemStack(PotionSnowballs.TIPPED_SNOWBALL, outputFactor * 8);
         result.setTagCompound(new NBTTagCompound());
 
         ItemStack potion = inv.getStackInRowAndColumn(1, 1);
-        PotionUtils.appendEffects(result, PotionUtils.getPotionFromItem(potion).getEffects());
+        PotionUtils.addPotionToItemStack(result, PotionUtils.getPotionFromItem(potion));
+        PotionUtils.appendEffects(result, PotionUtils.getFullEffectsFromItem(potion));
 
         return result;
     }
@@ -60,6 +68,6 @@ public class TippedSnowballRecipe extends IForgeRegistryEntry.Impl<IRecipe> impl
 
     @Override
     public ItemStack getRecipeOutput() {
-        return dummyResult;
+        return new ItemStack(PotionSnowballs.TIPPED_SNOWBALL, outputFactor * 8);
     }
 }

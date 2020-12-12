@@ -1,6 +1,6 @@
 package azmalent.potionsnowballs.proxy;
 
-import azmalent.potionsnowballs.client.TippedSnowballRendererFactory;
+import azmalent.potionsnowballs.client.renderer.TippedSnowballRenderer;
 import azmalent.potionsnowballs.common.entity.EntityTippedSnowball;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -26,7 +26,7 @@ public class ClientProxy implements IProxy {
     public void preInit(FMLPreInitializationEvent event) {
         RenderingRegistry.registerEntityRenderingHandler(
                 EntityTippedSnowball.class,
-                new TippedSnowballRendererFactory()
+                new TippedSnowballRenderer.Factory()
         );
     }
 
@@ -44,11 +44,11 @@ public class ClientProxy implements IProxy {
     private void registerColorHandler() {
         ItemColors colors = Minecraft.getMinecraft().getItemColors();
         colors.registerItemColorHandler(
-                (stack, tintIndex) -> {
-                    List<PotionEffect> effects = PotionUtils.getEffectsFromStack(stack);
-                    return PotionUtils.getPotionColorFromEffectList(effects);
-                },
-                TIPPED_SNOWBALL
+            (stack, tintIndex) -> {
+                List<PotionEffect> effects = PotionUtils.getEffectsFromStack(stack);
+                return PotionUtils.getPotionColorFromEffectList(effects);
+            },
+            TIPPED_SNOWBALL
         );
     }
 }

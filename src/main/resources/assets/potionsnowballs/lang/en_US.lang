@@ -1,3 +1,5 @@
+item.tipped_snowball.name=Tipped Snowball
+
 # Vanilla
 snowball.effect.moveSpeed=Snowball of Swiftness
 snowball.effect.moveSlowdown=Snowball of Slowness
