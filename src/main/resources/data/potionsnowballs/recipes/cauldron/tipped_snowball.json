@@ -1,0 +1,23 @@
+{
+  "type": "inspirations:cauldron_fill_potion",
+  "conditions": [
+    {
+      "type": "forge:and",
+      "values": [
+        {
+          "type": "inspirations:config",
+          "prop": "recipes_module"
+        },
+        {
+          "type": "inspirations:config",
+          "prop": "cauldron_tip_arrows"
+        }
+      ]
+    }
+  ],
+  "bottle": {
+    "item": "minecraft:snowball",
+    "amount_needed": 16
+  },
+  "potion": "potionsnowballs:tipped_snowball"
+}
