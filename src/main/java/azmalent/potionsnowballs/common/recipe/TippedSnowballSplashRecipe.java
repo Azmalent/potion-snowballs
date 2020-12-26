@@ -1,6 +1,8 @@
 package azmalent.potionsnowballs.common.recipe;
 
 import azmalent.potionsnowballs.PotionSnowballs;
+import azmalent.potionsnowballs.common.init.ModItems;
+import azmalent.potionsnowballs.common.init.ModRecipes;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -12,10 +14,10 @@ import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
-public class TippedSnowballRecipe extends SpecialRecipe {
-    private static ItemStack DUMMY = new ItemStack(PotionSnowballs.TIPPED_ITEM.get(), 16);
+public class TippedSnowballSplashRecipe extends SpecialRecipe {
+    private static ItemStack DUMMY = new ItemStack(ModItems.TIPPED_SNOWBALL.get(), 8);
 
-    public TippedSnowballRecipe(ResourceLocation id) {
+    public TippedSnowballSplashRecipe(ResourceLocation id) {
         super(id);
     }
 
@@ -26,14 +28,11 @@ public class TippedSnowballRecipe extends SpecialRecipe {
             Item item = stack.getItem();
 
             if (i == 4) {
-                boolean isLingeringPotion = item == Items.LINGERING_POTION
+                boolean isLingeringPotion = item == Items.SPLASH_POTION
                         && stack.hasTag() && stack.getTag().contains("Potion");
                 if (!isLingeringPotion) return false;
             }
-            else if (i % 2 == 1) {
-                if (item != Items.SNOW_BLOCK) return false;
-            }
-            else if (!stack.isEmpty()) {
+            else if (item != Items.SNOWBALL) {
                 return false;
             }
         }
@@ -43,7 +42,7 @@ public class TippedSnowballRecipe extends SpecialRecipe {
 
     @Override
     public ItemStack getCraftingResult(CraftingInventory inv) {
-        ItemStack result = new ItemStack(PotionSnowballs.TIPPED_ITEM.get(), 16);
+        ItemStack result = new ItemStack(ModItems.TIPPED_SNOWBALL.get(), 8);
         result.setTag(new CompoundNBT());
 
         ItemStack potion = inv.getStackInSlot(4);
@@ -65,6 +64,6 @@ public class TippedSnowballRecipe extends SpecialRecipe {
 
     @Override
     public IRecipeSerializer<?> getSerializer() {
-        return PotionSnowballs.TIPPED_RECIPE.get();
+        return ModRecipes.TIPPED_SNOWBALL_FROM_SPLASH_POTION.get();
     }
 }

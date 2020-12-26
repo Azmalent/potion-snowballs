@@ -1,6 +1,8 @@
 package azmalent.potionsnowballs.common.entity;
 
 import azmalent.potionsnowballs.PotionSnowballs;
+import azmalent.potionsnowballs.common.init.ModEntities;
+import azmalent.potionsnowballs.common.init.ModItems;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.IRendersAsItem;
@@ -44,12 +46,11 @@ public class SpectreSnowballEntity extends ProjectileItemEntity implements IRend
     }
 
     public SpectreSnowballEntity(double x, double y, double z, World worldIn) {
-        super(PotionSnowballs.SPECTRE_ENTITY.get(), x, y, z, worldIn);
-        PotionSnowballs.LOGGER.info("Creating snowball on " + (world.isRemote ? "CLIENT" : "SERVER"));
+        super(ModEntities.SPECTRE_SNOWBALL.get(), x, y, z, worldIn);
     }
 
     public SpectreSnowballEntity(LivingEntity shooter, World worldIn) {
-        super(PotionSnowballs.SPECTRE_ENTITY.get(), shooter, worldIn);
+        super(ModEntities.SPECTRE_SNOWBALL.get(), shooter, worldIn);
     }
 
     @Nonnull
@@ -69,7 +70,7 @@ public class SpectreSnowballEntity extends ProjectileItemEntity implements IRend
 
     @Override
     protected Item getDefaultItem() {
-        return PotionSnowballs.SPECTRE_ITEM.get();
+        return ModItems.SPECTRE_SNOWBALL.get();
     }
 
     @Override

@@ -1,6 +1,10 @@
 package azmalent.potionsnowballs.common.entity;
 
+import azmalent.potionsnowballs.ModCompat;
 import azmalent.potionsnowballs.PotionSnowballs;
+import azmalent.potionsnowballs.common.init.ModEntities;
+import azmalent.potionsnowballs.common.init.ModItems;
+import azmalent.potionsnowballs.common.init.ModParticles;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.IRendersAsItem;
@@ -39,11 +43,11 @@ public class TippedSnowballEntity extends ProjectileItemEntity implements IRende
     }
 
     public TippedSnowballEntity(double x, double y, double z, World worldIn) {
-        super(PotionSnowballs.TIPPED_ENTITY.get(), x, y, z, worldIn);
+        super(ModEntities.TIPPED_SNOWBALL.get(), x, y, z, worldIn);
     }
 
     public TippedSnowballEntity(LivingEntity shooter, World worldIn) {
-        super(PotionSnowballs.TIPPED_ENTITY.get(), shooter, worldIn);
+        super(ModEntities.TIPPED_SNOWBALL.get(), shooter, worldIn);
     }
 
     @Override
@@ -69,7 +73,7 @@ public class TippedSnowballEntity extends ProjectileItemEntity implements IRende
 
     @Override
     protected Item getDefaultItem() {
-        return PotionSnowballs.TIPPED_ITEM.get();
+        return ModItems.TIPPED_SNOWBALL.get();
     }
 
     @Override
@@ -143,6 +147,7 @@ public class TippedSnowballEntity extends ProjectileItemEntity implements IRende
         if (potion == Effects.INSTANT_DAMAGE && !undead || potion == Effects.INSTANT_HEALTH && undead) {
             float damage = (6 << amplifier) * scale;
             livingEntity.attackEntityFrom(DamageSource.MAGIC, damage);
+            ModCompat.CONSECRATION.smiteWithHealingPotion(livingEntity);
         } else if (potion == Effects.INSTANT_HEALTH && !undead || potion == Effects.INSTANT_DAMAGE && undead) {
             float healing = (4 << effect.getAmplifier()) * scale;
             livingEntity.heal(healing);
@@ -180,10 +185,19 @@ public class TippedSnowballEntity extends ProjectileItemEntity implements IRende
     @OnlyIn(Dist.CLIENT)
     public void handleStatusUpdate(byte id) {
         if (id == 3) {
-            IParticleData data = new ItemParticleData(ParticleTypes.ITEM, getItem());
+            int color = getColor();
+            if (color != -1) {
+                double r = (double) (color >> 16 & 255) / 255.0D;
+                double g = (double) (color >> 8 & 255) / 255.0D;
+                double b = (double) (color & 255) / 255.0D;
 
-            for(int i = 0; i < 8; ++i) {
-                this.world.addParticle(data, this.getPosX(), this.getPosY(), this.getPosZ(), 0.0D, 0.0D, 0.0D);
+                for (int i = 0; i < 8; i++) {
+                    this.world.addParticle(ModParticles.TIPPED_SNOWBALL.get(), this.getPosX(), this.getPosY(), this.getPosZ(), r, g, b);
+                }
+            } else {
+                for (int i = 0; i < 8; i++) {
+                    this.world.addParticle(ParticleTypes.ITEM_SNOWBALL, this.getPosX(), this.getPosY(), this.getPosZ(), 0, 0, 0);
+                }
             }
         }
     }

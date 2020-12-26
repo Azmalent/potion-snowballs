@@ -1,6 +1,7 @@
 package azmalent.potionsnowballs.compat.jei;
 
 import azmalent.potionsnowballs.PotionSnowballs;
+import azmalent.potionsnowballs.common.init.ModItems;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.VanillaRecipeCategoryUid;
@@ -18,7 +19,7 @@ public class JEIPlugin implements IModPlugin {
 
     @Override
     public void registerItemSubtypes(ISubtypeRegistration subtypeRegistry) {
-        subtypeRegistry.registerSubtypeInterpreter(PotionSnowballs.TIPPED_ITEM.get(), PotionSubtypeInterpreter.INSTANCE);
+        subtypeRegistry.registerSubtypeInterpreter(ModItems.TIPPED_SNOWBALL.get(), PotionSubtypeInterpreter.INSTANCE);
     }
 
     @Override
