@@ -25,6 +25,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -35,10 +36,13 @@ public class LifecycleEvents {
     public static void registerListeners() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         bus.addListener(LifecycleEvents::setup);
-        bus.addListener(LifecycleEvents::clientSetup);
         bus.addListener(LifecycleEvents::gatherData);
-        bus.addListener(LifecycleEvents::registerColorHandler);
-        bus.addListener(LifecycleEvents::registerParticleFactory);
+
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+	        bus.addListener(LifecycleEvents::clientSetup);
+	        bus.addListener(LifecycleEvents::registerColorHandler);
+	        bus.addListener(LifecycleEvents::registerParticleFactory);	
+        });
     }
 
     private static void setup(FMLCommonSetupEvent event) {
